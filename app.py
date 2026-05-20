@@ -1,8 +1,3 @@
-# 🎸 Trivia de Cantantes del Rock Peruano en Streamlit
-
-## `app.py`
-
-```python
 import streamlit as st
 import random
 
@@ -71,14 +66,12 @@ def initialize_game():
     """Inicializa o reinicia la partida."""
     st.session_state.current_question = 0
     st.session_state.score = 0
-    st.session_state.answered = False
-    st.session_state.selected = None
 
     # Mezclar preguntas
     questions = QUESTIONS.copy()
     random.shuffle(questions)
 
-    # Tomar solo 5 preguntas y mezclar opciones
+    # Mezclar opciones de cada pregunta
     prepared = []
     for q in questions[:5]:
         q_copy = q.copy()
@@ -90,33 +83,33 @@ def initialize_game():
     st.session_state.questions = prepared
 
 
-# Inicialización
+# Inicialización del juego
 if "questions" not in st.session_state:
     initialize_game()
 
 
 # Título
 st.title("🎸 Trivia: Cantantes del Rock Peruano")
-st.write("Responde las 5 preguntas. ¡Si aciertas todas, recibirás una sorpresa! 🎉")
+st.write(
+    "Responde las 5 preguntas. "
+    "¡Si aciertas todas, recibirás una animación de celebración! 🎉"
+)
 
-
-# Datos actuales
+# Variables de estado
 index = st.session_state.current_question
 score = st.session_state.score
 questions = st.session_state.questions
-
+total_questions = len(questions)
 
 # Barra de progreso
-progress = index / len(questions)
-st.progress(progress)
-st.write(f"**Puntaje:** {score} / {len(questions)}")
+st.progress(index / total_questions)
+st.write(f"**Puntaje actual:** {score} / {total_questions}")
 
-
-# Si todavía hay preguntas
-if index < len(questions):
+# Mostrar preguntas
+if index < total_questions:
     q = questions[index]
 
-    st.subheader(f"Pregunta {index + 1} de {len(questions)}")
+    st.subheader(f"Pregunta {index + 1} de {total_questions}")
     st.write(q["question"])
 
     selected = st.radio(
@@ -130,88 +123,40 @@ if index < len(questions):
             st.success("✅ ¡Correcto!")
             st.session_state.score += 1
         else:
-            st.error(f"❌ Incorrecto. La respuesta correcta era: {q['answer']}")
+            st.error(
+                f"❌ Incorrecto. La respuesta correcta era: {q['answer']}"
+            )
 
         st.session_state.current_question += 1
         st.rerun()
 
 # Fin del juego
 else:
-    total = len(questions)
-    st.header("🏁 Trivia finalizada")    
-    st.write(f"Tu puntaje final es **{score} de {total}**.")
+    final_score = st.session_state.score
 
-    if score == total:
+    st.header("🏁 Trivia finalizada")
+    st.write(
+        f"Tu puntaje final es "
+        f"**{final_score} de {total_questions}**."
+    )
+
+    # Si acertó todas las preguntas
+    if final_score == total_questions:
         st.balloons()
-        st.success("🏆 ¡Felicidades! ¡Respondiste correctamente las 5 preguntas! 🎸🤘")
-        st.markdown(
-            """
-            ## 🌟 ¡Eres un verdadero experto del rock peruano! 🌟
-            """
+        st.success(
+            "🏆 ¡Felicidades! "
+            "¡Respondiste correctamente las 5 preguntas! 🎸🤘"
         )
-    elif score >= 3:
+        st.markdown("## 🌟 ¡Eres un verdadero experto del rock peruano! 🌟")
+
+    elif final_score >= 3:
         st.info("🎵 ¡Muy bien! Conoces bastante del rock peruano.")
     else:
-        st.warning("📚 Sigue escuchando rock peruano y vuelve a intentarlo.")
+        st.warning(
+            "📚 Sigue escuchando rock peruano y vuelve a intentarlo."
+        )
 
+    # Botón para reiniciar
     if st.button("🔄 Jugar nuevamente"):
         initialize_game()
         st.rerun()
-```
-
----
-
-## `requirements.txt`
-
-```txt
-streamlit>=1.45.0
-```
-
----
-
-# 📁 Estructura del Proyecto
-
-```text
-trivia-rock-peruano/
-├── app.py
-└── requirements.txt
-```
-
----
-
-# 🚀 Cómo subir a GitHub
-
-1. Crea un repositorio en GitHub llamado `trivia-rock-peruano`.
-2. Sube los archivos `app.py` y `requirements.txt`.
-3. Haz commit y push.
-
----
-
-# ☁️ Cómo desplegar en Streamlit Cloud
-
-1. Ingresa a [https://share.streamlit.io](https://share.streamlit.io)
-2. Inicia sesión con tu cuenta de GitHub.
-3. Selecciona el repositorio `trivia-rock-peruano`.
-4. En `Main file path`, escribe `app.py`.
-5. Haz clic en **Deploy**.
-
----
-
-# ▶️ Ejecutar localmente
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
----
-
-# ✨ Características incluidas
-
-* ✅ 5 preguntas sobre cantantes del rock peruano.
-* ✅ Opciones mezcladas aleatoriamente.
-* ✅ Preguntas en orden aleatorio.
-* ✅ Puntaje automático.
-* ✅ Barra de progreso.
-* ✅ Animación con globos si el jugador obtiene 5/5.
-* ✅ Botón para reiniciar el juego.
